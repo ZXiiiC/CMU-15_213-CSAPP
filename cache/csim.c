@@ -27,6 +27,8 @@ void Store(int* cache,int tag,int sAdr,int bAdr);
 void Modify(int* cache,int tag,int sAdr,int bAdr);
 //char*[] split(char* str,char* delim);
 void parseAdr(long address,int* ptag,int* psAdr,int* pbAdr);
+void memoryAccess(int* cache,int tag,int sAdr);
+void orderSet(int* cache,int sAdr,int e);
 
 int main(int argc, char *argv[])
 {
@@ -123,17 +125,21 @@ void readInpt(FILE* fp,int* cache){
 			continue;
 		case 'L':
 			if(visTag) printf("%c %lx,%d",operation,address,size);
-			Load(cache,tag,sAdr,bAdr);  
+			//Load(cache,tag,sAdr,bAdr);
+			memoryAccess(cache,tag,sAdr);  
 			if(visTag) printf("\n"); 
 			break;
 		case 'S':
 			if(visTag) printf("%c %lx,%d",operation,address,size);
-			Store(cache,tag,sAdr,bAdr); 
+			//Store(cache,tag,sAdr,bAdr); 
+			memoryAccess(cache,tag,sAdr); 
 			if(visTag) printf("\n"); 
 			break;
 		case 'M':
 			if(visTag) printf("%c %lx,%d",operation,address,size);
-			Modify(cache,tag,sAdr,bAdr); 
+			//Modify(cache,tag,sAdr,bAdr); 
+			memoryAccess(cache,tag,sAdr);
+			memoryAccess(cache,tag,sAdr);  
 			if(visTag) printf("\n");
 			break;
 		default:
@@ -158,6 +164,58 @@ int* InitCache(){
 		printf("Init cache success, cache size = %d\n",cacheSize);
 	#endif
 	return cache;
+}
+
+void orderSet(int* cache,int sAdr,int e){
+	if(eNum==1) return ;
+	if(valid[sAdr+(eNum-1)*setNum]==eNum){
+		int save=cache[sAdr+(eNum-1)*setNum];
+		for(int i=eNum-1;i>0;i--)
+			cache[i]=cache[i-1];
+		cache[0]=save;
+		return;
+	}
+	else{
+		int save=cache[sAdr+e*setNum];
+		while(valid[sAdr+(--e)*setNum]!=0){
+			cache[sAdr+(e+1)*setNum]=cache[sAdr+e*setNum];
+		}
+		cache[sAdr+(e+1)*setNum]=save;
+		return;
+	}
+}
+
+void memoryAccess(int* cache,int tag,int sAdr){
+	int e=eNum,curAdr;
+	if(valid[sAdr+(eNum-1)*setNum]!=eNum){
+		while(--e>=0){
+			curAdr=setNum*e+sAdr;
+			if(valid[curAdr]==0){//cold miss
+				valid[curAdr]=1;
+				cache[curAdr]=tag;
+				if(visTag) printf(" miss");
+				miss_count++;
+				valid[sAdr+(eNum-1)*setNum]++;
+				return ;
+			}
+			else if(cache[curAdr]==tag){//hit
+				if(visTag) printf(" hit");
+				hit_count++;
+				orderSet(cache,sAdr,e);
+				return ;
+			}
+		
+		}
+	}
+	else{//eviction
+		
+		if(visTag) printf(" miss eviction");
+		miss_count++;
+		eviction_count++;
+		cache[sAdr+(eNum-1)*setNum]=tag;
+		orderSet(cache,sAdr,e);
+		return ;
+	}
 }
 
 void Load(int* cache,int tag,int sAdr,int bAdr){

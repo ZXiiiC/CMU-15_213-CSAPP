@@ -1,0 +1,27 @@
+==8941== Lackey, an example Valgrind tool
+==8941== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote.
+==8941== Using Valgrind-3.15.0-608cb11914-20190413 and LibVEX; rerun with -h for copyright info
+==8941== Command: ./tracegen -M 61 -N 67 -F 1
+==8941== 
+--8941-- Valgrind options:
+--8941--    --tool=lackey
+--8941--    --trace-mem=yes
+--8941--    --log-fd=1
+--8941--    -v
+--8941-- Contents of /proc/version:
+--8941--   Linux version 5.13.0-41-generic (buildd@lcy02-amd64-017) (gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #46~20.04.1-Ubuntu SMP Wed Apr 20 13:16:21 UTC 2022
+--8941-- 
+--8941-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand
+--8941-- Page sizes: currently 4096, max supported 4096
+--8941-- Valgrind library directory: /usr/lib/x86_64-linux-gnu/valgrind
+--8941-- Reading syms from /home/zxc/CMU-15_213-CSAPP/cache/tracegen
+--8941-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-2.31.so
+--8941--   Considering /usr/lib/x86_64-linux-gnu/ld-2.31.so ..
+--8941--   .. CRC mismatch (computed 0306b78c wanted 8d362b37)
+--8941--   Considering /lib/x86_64-linux-gnu/ld-2.31.so ..
+--8941--   .. CRC mismatch (computed 0306b78c wanted 8d362b37)
+--8941--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.31.so ..
+--8941--   .. CRC is valid
+--8941-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/lackey-amd64-linux
+--8941--    object doesn't have a symbol table
+--8941--    object doesn't have a dynamic symbol table
