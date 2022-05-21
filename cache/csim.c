@@ -167,55 +167,46 @@ int* InitCache(){
 }
 
 void orderSet(int* cache,int sAdr,int e){
-	if(eNum==1) return ;
-	if(valid[sAdr+(eNum-1)*setNum]==eNum){
-		int save=cache[sAdr+(eNum-1)*setNum];
-		for(int i=eNum-1;i>0;i--)
-			cache[i]=cache[i-1];
-		cache[0]=save;
-		return;
-	}
-	else{
-		int save=cache[sAdr+e*setNum];
-		while(valid[sAdr+(--e)*setNum]!=0){
-			cache[sAdr+(e+1)*setNum]=cache[sAdr+e*setNum];
-		}
-		cache[sAdr+(e+1)*setNum]=save;
-		return;
-	}
+	if(eNum==1) return ;//e=1不需要LRU
+	int save=cache[sAdr+e*setNum];
+	
+	while(e){
+		cache[sAdr+e*setNum]=cache[sAdr+(e-1)*setNum];
+		e--;
+	}cache[sAdr]=save;
+	return;
+
 }
 
 void memoryAccess(int* cache,int tag,int sAdr){
-	int e=eNum,curAdr;
-	if(valid[sAdr+(eNum-1)*setNum]!=eNum){
-		while(--e>=0){
-			curAdr=setNum*e+sAdr;
-			if(valid[curAdr]==0){//cold miss
-				valid[curAdr]=1;
-				cache[curAdr]=tag;
-				if(visTag) printf(" miss");
-				miss_count++;
-				valid[sAdr+(eNum-1)*setNum]++;
-				return ;
-			}
-			else if(cache[curAdr]==tag){//hit
-				if(visTag) printf(" hit");
-				hit_count++;
-				orderSet(cache,sAdr,e);
-				return ;
-			}
-		
+	int e=0,curAdr;
+	
+	while(e<eNum){
+		curAdr=setNum*e+sAdr;
+		if(valid[curAdr]==0){//cold miss
+			valid[curAdr]=1;
+			cache[curAdr]=tag;
+			if(visTag) printf(" miss");
+			miss_count++;
+			orderSet(cache,sAdr,e);
+			return ;
 		}
-	}
-	else{//eviction
-		
-		if(visTag) printf(" miss eviction");
-		miss_count++;
-		eviction_count++;
-		cache[sAdr+(eNum-1)*setNum]=tag;
-		orderSet(cache,sAdr,e);
-		return ;
-	}
+		else if(cache[curAdr]==tag){//hit
+			if(visTag) printf(" hit");
+			hit_count++;
+			orderSet(cache,sAdr,e);
+			return ;
+		}
+		e++;
+	}	
+	//eviction	
+	if(visTag) printf(" miss eviction");
+	miss_count++;
+	eviction_count++;
+	cache[sAdr+(eNum-1)*setNum]=tag;
+	orderSet(cache,sAdr,eNum-1);
+	return ;
+	
 }
 
 void Load(int* cache,int tag,int sAdr,int bAdr){
